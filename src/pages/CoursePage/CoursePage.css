@@ -1,0 +1,97 @@
+/* Простые стили для страницы курса */
+.course-page {
+  --course-primary-color: var(--tg-theme-button-color, #007bff);
+  --course-text-color: var(--tg-theme-text-color, #000);
+  --course-hint-color: var(--tg-theme-hint-color, #666);
+  --course-secondary-bg: var(--tg-theme-secondary-bg-color, #f8f9fa);
+  --course-separator-color: var(--tg-theme-separator-color, #e9ecef);
+}
+
+/* Заголовок курса */
+.course-title {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 8px 0;
+  color: var(--course-text-color);
+}
+
+/* Подзаголовок школы */
+.course-school {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--course-hint-color);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Описание курса */
+.course-description {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--course-text-color);
+  margin: 0;
+}
+
+/* Секция с информацией о курсе */
+.course-info-section {
+  background: var(--course-secondary-bg);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.course-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--course-separator-color);
+}
+
+.course-info-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.course-info-item:first-child {
+  padding-top: 0;
+}
+
+.course-info-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--course-text-color);
+}
+
+.course-info-value {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--course-primary-color);
+}
+
+/* Специальные стили для цены */
+.course-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--course-primary-color);
+}
+
+/* Изображение курса */
+.course-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+/* Простые стили для секций */
+.course-page .tgui-section {
+  margin-bottom: 4px;
+}
+
+.course-page .tgui-section:last-child {
+  margin-bottom: 0;
+}

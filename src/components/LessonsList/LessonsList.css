@@ -1,0 +1,11 @@
+/* Простые стили для списка уроков */
+.lessons-section-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color, #000);
+  margin: 0;
+}
+
+.lessons-list-container {
+  margin-bottom: 16px;
+}

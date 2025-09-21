@@ -4,6 +4,7 @@ import { retrieveLaunchParams, useSignal, isMiniAppDark } from '@telegram-apps/s
 import { AppRoot } from '@telegram-apps/telegram-ui';
 
 import { routes } from '@/navigation/routes.tsx';
+import { TabBar } from '@/components/TabBar/TabBar.tsx';
 
 export function App() {
   const lp = useMemo(() => retrieveLaunchParams(), []);
@@ -17,8 +18,9 @@ export function App() {
       <HashRouter>
         <Routes>
           {routes.map((route) => <Route key={route.path} {...route} />)}
-          <Route path="*" element={<Navigate to="/"/>}/>
+          <Route path="*" element={<Navigate to="/education"/>}/>
         </Routes>
+        <TabBar />
       </HashRouter>
     </AppRoot>
   );

@@ -1,0 +1,217 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--tg-theme-bg-color);
+  border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  min-height: 56px;
+  gap: 12px;
+}
+
+/* Левая часть */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.back-button {
+  flex-shrink: 0;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.page-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.page-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.page-subtitle {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Правая часть */
+.header-right {
+  flex-shrink: 0;
+}
+
+.profile-cell {
+  padding: 4px 8px !important;
+  min-height: 40px !important;
+  border-radius: 8px;
+  background-color: var(--tg-theme-secondary-bg-color);
+  border: 1px solid var(--tg-theme-secondary-bg-color);
+  transition: all 0.2s ease;
+}
+
+.profile-cell:hover {
+  background-color: var(--tg-theme-button-color);
+  border-color: var(--tg-theme-button-color);
+}
+
+.profile-cell:hover .user-avatar {
+  transform: scale(1.1);
+}
+
+.user-avatar {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .header-content {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  
+  .header-left {
+    gap: 8px;
+  }
+  
+  .page-info {
+    gap: 6px;
+  }
+  
+  .page-title {
+    font-size: 14px;
+  }
+  
+  .page-subtitle {
+    font-size: 11px;
+  }
+  
+  .profile-cell {
+    padding: 2px 6px !important;
+    min-height: 36px !important;
+  }
+}
+
+/* Компактный режим для маленьких экранов */
+@media (max-width: 360px) {
+  .page-icon {
+    font-size: 18px;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .page-title {
+    font-size: 13px;
+  }
+  
+  .profile-cell {
+    padding: 4px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+  
+  .profile-cell .user-avatar {
+    margin-right: 0 !important;
+  }
+}
+
+/* Анимации */
+@keyframes slideIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.app-header {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+  .app-header {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Состояния кнопок */
+.back-button:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+/* Стили для различных типов страниц */
+.app-header.course-page .page-icon {
+  color: var(--tg-theme-link-color);
+}
+
+.app-header.lesson-page .page-icon {
+  color: var(--tg-theme-button-color);
+}
+
+.app-header.profile-page .page-icon {
+  color: var(--tg-theme-accent-text-color);
+}
+
+.app-header.notifications-page .page-icon {
+  color: var(--tg-theme-destructive-text-color);
+}

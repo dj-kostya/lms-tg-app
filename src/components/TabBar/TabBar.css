@@ -1,0 +1,18 @@
+/* CSS переменные для управления отступами */
+:root {
+  --tabbar-height: 60px;
+  --tabbar-safe-area: 80px; /* Высота TabBar + дополнительный отступ */
+}
+
+/* Основной отступ для body уже задан в index.css */
+/* Дополнительные стили для компонентов, которые могут перекрываться */
+
+/* Убеждаемся, что последние элементы в списках имеют достаточный отступ */
+.tgui-list:last-child {
+  margin-bottom: var(--tabbar-safe-area);
+}
+
+/* Специальный класс для секций с кнопками внизу */
+.section-with-bottom-button {
+  padding-bottom: var(--tabbar-safe-area);
+}

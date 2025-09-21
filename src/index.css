@@ -2,4 +2,11 @@ body {
   background: var(--tg-theme-secondary-bg-color, white);
   padding: 0;
   margin: 0;
+  /* Добавляем отступ снизу для TabBar */
+  padding-bottom: 60px;
+}
+
+/* Убираем отступ на страницах без TabBar */
+body.no-tabbar {
+  padding-bottom: 0;
 }

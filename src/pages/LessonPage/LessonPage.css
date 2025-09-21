@@ -1,0 +1,147 @@
+/* Стили для страницы урока */
+.lesson-page {
+  --lesson-primary-color: var(--tg-theme-button-color, #007bff);
+  --lesson-text-color: var(--tg-theme-text-color, #000);
+  --lesson-hint-color: var(--tg-theme-hint-color, #666);
+  --lesson-secondary-bg: var(--tg-theme-secondary-bg-color, #f8f9fa);
+  --lesson-separator-color: var(--tg-theme-separator-color, #e9ecef);
+}
+
+/* Заголовок урока */
+.lesson-header {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.lesson-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--lesson-secondary-bg);
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--lesson-hint-color);
+}
+
+.lesson-type-icon {
+  font-size: 16px;
+}
+
+.lesson-type-text {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lesson-title {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--lesson-text-color);
+}
+
+.lesson-duration {
+  font-size: 16px;
+  color: var(--lesson-hint-color);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Аватар курса */
+.course-avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  background: var(--lesson-secondary-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+/* Описание урока */
+.lesson-description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--lesson-text-color);
+  margin: 0;
+}
+
+/* Содержание урока */
+.lesson-content {
+  padding: 16px 0;
+}
+
+.video-placeholder,
+.text-content,
+.quiz-content,
+.practice-content {
+  text-align: center;
+  padding: 32px 16px;
+  background: var(--lesson-secondary-bg);
+  border-radius: 12px;
+  border: 2px dashed var(--lesson-separator-color);
+}
+
+.video-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.video-note,
+.text-note,
+.quiz-note,
+.practice-note {
+  font-size: 14px;
+  color: var(--lesson-hint-color);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Кнопки действий */
+.lesson-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.start-lesson-button {
+  background: linear-gradient(135deg, var(--lesson-primary-color), #0056b3);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.complete-lesson-button {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .lesson-title {
+    font-size: 20px;
+  }
+  
+  .lesson-description {
+    font-size: 15px;
+  }
+  
+  .video-placeholder,
+  .text-content,
+  .quiz-content,
+  .practice-content {
+    padding: 24px 12px;
+  }
+  
+  .video-icon {
+    font-size: 40px;
+  }
+}
