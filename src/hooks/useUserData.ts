@@ -18,10 +18,10 @@ export function useUserData() {
       // Преобразуем данные Telegram пользователя в формат UserProfile
       const userProfile: UserProfile = {
         id: telegramUser.id.toString(),
-        firstName: telegramUser.firstName || 'Пользователь',
-        lastName: telegramUser.lastName || undefined,
+        firstName: telegramUser.first_name || 'Пользователь',
+        lastName: telegramUser.last_name || undefined,
         username: telegramUser.username || undefined,
-        photoUrl: telegramUser.photoUrl || undefined,
+        photoUrl: telegramUser.photo_url || undefined,
         email: undefined, // Telegram не предоставляет email
         phone: undefined, // Telegram не предоставляет телефон
         joinDate: new Date(), // Дата регистрации в приложении

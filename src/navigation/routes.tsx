@@ -10,6 +10,7 @@ interface Route {
   path: string;
   Component: ComponentType;
   title?: string;
+  icon?: string;
 }
 
 export const routes: Route[] = [

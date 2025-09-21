@@ -9,7 +9,6 @@ import {
   Title,
   Cell,
   Badge,
-  Div,
   Spinner
 } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
@@ -22,7 +21,6 @@ import './NotificationsPage.css';
 export const NotificationsPage: FC = () => {
   const navigate = useNavigate();
   const {
-    notifications,
     groupedNotifications,
     stats,
     isFromTelegram,
@@ -209,7 +207,6 @@ export const NotificationsPage: FC = () => {
                           </Text>
                           <Badge 
                             type="number" 
-                            size="s"
                             style={{ 
                               backgroundColor: getPriorityColor(notification.priority),
                               marginLeft: '8px'

@@ -9,14 +9,13 @@ import {
   Cell,
   Avatar,
   Progress,
-  Badge,
-  Div
+  Badge
 } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { SimpleHeader } from '@/components/Header';
 import { mockStudyStats, findCourseById, findSchoolByCourseId } from '@/data/mockData';
 import { useUserData, useUserDisplayName } from '@/hooks/useUserData';
-import type { UserProfile, StudyStats } from '@/types';
+import type { UserProfile } from '@/types';
 
 import './ProfilePage.css';
 
@@ -91,7 +90,7 @@ export const ProfilePage: FC = () => {
               <div className="profile-avatar-section">
                 <Avatar 
                   src={profile.photoUrl} 
-                  size={80}
+                  size={96}
                   className="profile-avatar"
                 />
                 <div className="profile-level-badge">
@@ -251,7 +250,7 @@ export const ProfilePage: FC = () => {
                   after={
                     <div className="course-progress">
                       <Text className="course-progress-text">{progress}%</Text>
-                      <Progress value={progress} size="s" />
+                      <Progress value={progress} />
                     </div>
                   }
                   onClick={() => navigate(`/education/course/${course.id}`)}
