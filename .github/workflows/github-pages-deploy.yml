@@ -34,8 +34,14 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           registry-url: 'https://registry.npmjs.org'
+      
+      - name: Generate spec
+        run: cd spec && npm i
+      
+      - name: Generate spec
+        run: npm run generate-spec
 
       - name: Install deps
         run: npm ci
@@ -51,6 +57,12 @@ jobs:
         with:
           # Upload dist repository
           path: './dist'
+      
+      - name: Upload openapi spec
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi.yaml
+          path: tsp-output/schema/openapi.yaml
 
       - name: Deploy to GitHub Pages
         id: deployment

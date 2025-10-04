@@ -15,15 +15,25 @@ import { Page } from '@/components/Page.tsx';
 import { SimpleHeader } from '@/components/Header';
 import { mockStudyStats, findCourseById, findSchoolByCourseId } from '@/data/mockData';
 import { useUserData, useUserDisplayName } from '@/hooks/useUserData';
+import { useAuthContext } from '@/components/AuthProvider';
 import type { UserProfile } from '@/types';
 
 import './ProfilePage.css';
 
 export const ProfilePage: FC = () => {
   const navigate = useNavigate();
-  const { user: profile, isFromTelegram } = useUserData();
+  const { user: profile, isFromTelegram, isFromAuth } = useUserData();
   const displayName = useUserDisplayName();
   const stats = mockStudyStats;
+  
+  // Получаем контекст авторизации для кнопки выхода
+  let authContext: ReturnType<typeof useAuthContext> | null = null;
+  try {
+    authContext = useAuthContext();
+  } catch {
+    console.log('Контекст недоступен');
+    // Контекст недоступен
+  }
 
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
@@ -79,6 +89,12 @@ export const ProfilePage: FC = () => {
     navigate('/education');
   };
 
+  const handleLogout = () => {
+    if (authContext) {
+      authContext.logout();
+    }
+  };
+
   return (
     <Page back={false}>
       <SimpleHeader showBackButton={false} className="profile-page-header" />
@@ -115,7 +131,12 @@ export const ProfilePage: FC = () => {
                 <Text className="profile-join-date">
                   Участник с {formatDate(profile.joinDate)}
                 </Text>
-                {isFromTelegram && (
+                {isFromAuth && (
+                  <Text className="profile-source">
+                    🔐 Авторизован через API
+                  </Text>
+                )}
+                {isFromTelegram && !isFromAuth && (
                   <Text className="profile-source">
                     📱 Данные из Telegram
                   </Text>
@@ -315,6 +336,20 @@ export const ProfilePage: FC = () => {
               </Cell>
             )}
           </Section>
+
+          {/* Кнопка выхода */}
+          {authContext && authContext.isAuthenticated && (
+            <Section>
+              <Button 
+                size="m" 
+                mode="gray"
+                stretched
+                onClick={handleLogout}
+              >
+                Выйти из аккаунта
+              </Button>
+            </Section>
+          )}
         </List>
       </div>
     </Page>

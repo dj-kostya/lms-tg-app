@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, List, Section, Text, Title } from '@telegram-apps/telegram-ui';
+import { List, Section, Text, Title } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { SimpleHeader } from '@/components/Header';
 import { findCourseById, findSchoolByCourseId } from '@/data/mockData';
@@ -117,19 +117,6 @@ export const CoursePage: FC = () => {
                     />
                 )}
 
-                <Section className="section-with-bottom-button">
-                    <Button 
-                        size="l" 
-                        stretched
-                        className="course-enroll-button"
-                        onClick={() => {
-                            // TODO: Implement course enrollment
-                            console.log('Enroll in course:', course.id);
-                        }}
-                    >
-                        Записаться на курс
-                    </Button>
-                </Section>
             </div>
         </Page>
     );

@@ -1,16 +1,42 @@
 import { useMemo } from 'react';
 import { initDataState, useSignal } from '@telegram-apps/sdk-react';
 import { mockUserProfile } from '@/data/mockData';
+import { useAuthContext } from '@/components/AuthProvider';
 import type { UserProfile } from '@/types';
 
 /**
- * Хук для получения данных пользователя из Telegram Init Data или моков
+ * Хук для получения данных пользователя из контекста авторизации, Telegram Init Data или моков
  * @returns Объект с данными пользователя и информацией о источнике данных
  */
 export function useUserData() {
   const initData = useSignal(initDataState);
   
+  // Пытаемся получить данные из контекста авторизации
+  let authUser: UserProfile | null = null;
+  let isFromAuth = false;
+  
+  try {
+    const authContext = useAuthContext();
+    if (authContext.isAuthenticated && authContext.user) {
+      authUser = authContext.user;
+      isFromAuth = true;
+    }
+  } catch {
+    // Контекст авторизации недоступен, используем fallback
+  }
+  
   const userData = useMemo(() => {
+    // Приоритет: данные из авторизации > данные из Telegram > моки
+    if (authUser && isFromAuth) {
+      return {
+        user: authUser,
+        isFromTelegram: false,
+        isFromAuth: true,
+        telegramUser: null,
+        initData: null
+      };
+    }
+    
     // Если есть данные из Telegram
     if (initData?.user) {
       const telegramUser = initData.user;
@@ -40,6 +66,7 @@ export function useUserData() {
       return {
         user: userProfile,
         isFromTelegram: true,
+        isFromAuth: false,
         telegramUser: telegramUser,
         initData: initData
       };
@@ -49,10 +76,11 @@ export function useUserData() {
     return {
       user: mockUserProfile,
       isFromTelegram: false,
+      isFromAuth: false,
       telegramUser: null,
       initData: null
     };
-  }, [initData]);
+  }, [initData, authUser, isFromAuth]);
 
   return userData;
 }

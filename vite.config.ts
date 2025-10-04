@@ -33,6 +33,41 @@ export default defineConfig({
     // Exposes your dev server and makes it accessible for the devices in the same network.
     host: true,
     allowedHosts: ['knosorev-test.loca.lt'],
+    cors: {
+      origin: true, // Разрешить все origins
+      credentials: true, // Разрешить cookies и авторизационные заголовки
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-TG-INIT-DATA', 'X-Requested-With'],
+    },
+    proxy: {
+      // Прокси для API запросов во время разработки
+      '/api': {
+        target: 'https://n8n.tg.knosorev.ru',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => {
+          const newPath = path.replace(/^\/api/, '/webhook/api');
+          console.log('🔄 Rewriting path:', path, '->', newPath);
+          return newPath;
+        },
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('🔄 Proxying request to:', proxyReq.path);
+            console.log('📤 Method:', proxyReq.method);
+            console.log('📤 Headers:', proxyReq.getHeaders());
+          });
+          
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            console.log('📥 Response status:', proxyRes.statusCode);
+            console.log('📥 Response headers:', proxyRes.headers);
+          });
+          
+          proxy.on('error', (err, req, res) => {
+            console.error('❌ Proxy error:', err);
+          });
+        },
+      },
+    },
   },
 });
 

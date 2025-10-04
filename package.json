@@ -12,19 +12,24 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "preview": "vite preview",
-    "predeploy": "npm run build"
+    "predeploy": "npm run build",
+    "generate-spec": "tsp compile spec"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "@telegram-apps/sdk-react": "^3.3.6",
     "@telegram-apps/telegram-ui": "^2.1.9",
     "@tonconnect/ui-react": "^2.2.0",
     "eruda": "^3.4.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.1"
+    "react-router-dom": "^6.30.1",
+    "tg-lms-backend-api": "file:tsp-output/clients/js"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+    "@tanstack/eslint-plugin-query": "^5.91.0",
     "@types/node": "^20.19.11",
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",

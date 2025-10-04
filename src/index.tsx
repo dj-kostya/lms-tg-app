@@ -22,6 +22,8 @@ try {
   const debug = (launchParams.tgWebAppStartParam || '').includes('platformer_debug')
     || import.meta.env.DEV;
 
+  console.log('launchParams', launchParams);
+
   // Configure all application dependencies.
   await init({
     debug,
@@ -31,7 +33,7 @@ try {
     .then(() => {
       root.render(
         <StrictMode>
-          <Root/>
+          <Root debug={debug}/>
         </StrictMode>,
       );
     });

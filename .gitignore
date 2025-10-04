@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+tsp-output
 dist-ssr
 *.local
 

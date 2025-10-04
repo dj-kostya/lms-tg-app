@@ -3,7 +3,7 @@ import type { School, Course, UserProfile, StudyStats, Notification, Lesson } fr
 export const mockSchools: School[] = [
   {
     id: '1',
-    name: 'Программирование',
+    name: 'Школа программирования Hillel',
     description: 'Изучите современные языки программирования',
     courses: [
       {
