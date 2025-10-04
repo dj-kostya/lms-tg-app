@@ -1,5 +1,6 @@
 import "@typespec/http";
 import "./user.tsp";
+import "./tasks.tsp";
 
 using Http;
 @service(#{ title: "TgLMSAppBackend" })
