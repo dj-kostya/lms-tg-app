@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['master']
+    branches: ["master"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -17,7 +17,7 @@ permissions:
 
 # Allow one concurrent deployment
 concurrency:
-  group: 'pages'
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
@@ -31,15 +31,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare spec
+        uses: actions/setup-node@v3
+        with:
+          working-directory: spec
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+          cache-dependency-path: "spec/package-lock.json"
+      
+      - name: Generate spec
+        run: npm run generate-spec
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          registry-url: 'https://registry.npmjs.org'
-      
-      - name: Generate spec
-        run: cd spec && npm i && cd .. && npm run generate-spec
-      
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+          cache-dependency-path: "package-lock.json"
+
       - name: Install deps
         run: npm ci
 
@@ -53,8 +64,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist repository
-          path: './dist'
-      
+          path: "./dist"
+
       - name: Upload openapi spec
         uses: actions/upload-artifact@v4
         with:
