@@ -40,6 +40,10 @@ jobs:
           cache: "npm"
           cache-dependency-path: "spec/package-lock.json"
       
+      - name: Install spec deps
+        run: npm ci
+        working-directory: spec
+
       - name: Generate spec
         run: npm run generate-spec
 
