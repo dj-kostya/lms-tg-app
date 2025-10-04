@@ -38,7 +38,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       
       - name: Generate spec
-        run: cd spec && npm i
+        run: cd spec && npm ci
       
       - name: Generate spec
         run: npm run generate-spec
