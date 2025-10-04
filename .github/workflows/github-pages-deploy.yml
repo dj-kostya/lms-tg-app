@@ -34,27 +34,18 @@ jobs:
       - name: Prepare spec
         uses: actions/setup-node@v3
         with:
-          working-directory: spec
           node-version: 20
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
-          cache-dependency-path: "spec/package-lock.json"
+          cache-dependency-path: "**/package-lock.json"
       
       - name: Install spec deps
-        run: npm i
+        run: npm ci
         working-directory: spec
 
       - name: Generate spec
         run: npx tsp compile . --output-dir ../tsp-output
         working-directory: spec
-
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          registry-url: "https://registry.npmjs.org"
-          cache: "npm"
-          cache-dependency-path: "package-lock.json"
 
       - name: Install deps
         run: npm ci
