@@ -13,7 +13,7 @@
     "lint:fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "generate-spec": "npx tsp compile spec"
+    "generate-spec": "cd spec && npx tsp compile . --output-dir ../tsp-output"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.2",

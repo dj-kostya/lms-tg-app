@@ -45,7 +45,8 @@ jobs:
         working-directory: spec
 
       - name: Generate spec
-        run: npm run generate-spec
+        run: npx tsp compile . --output-dir ../tsp-output
+        working-directory: spec
 
       - name: Setup node
         uses: actions/setup-node@v3
