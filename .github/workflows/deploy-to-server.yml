@@ -29,7 +29,7 @@ on:
 
 env:
   APP_NAME: lms-tg-app
-  ENVIRONMENT: ${{ github.event.inputs.environment || 'production' }}
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'prod' }}
   DOCKER_IMAGE: ${{ github.repository }}:${{ github.event.inputs.environment || 'production' }}
 
 permissions:
