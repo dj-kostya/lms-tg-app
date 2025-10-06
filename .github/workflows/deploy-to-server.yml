@@ -108,12 +108,12 @@ jobs:
         with:
           name: server-deploy-${{ env.ENVIRONMENT }}
           path: |
-            ${{ env.APP_NAME }}.tar.gz
-            deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
-            deploy/.env
-            deploy/deploy.sh
-            deploy/nginx.conf
-            deploy/env.${{ env.ENVIRONMENT }}
+            server-deploy/${{ env.APP_NAME }}.tar.gz
+            server-deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
+            server-deploy/.env
+            server-deploy/deploy.sh
+            server-deploy/nginx.conf
+            server-deploy/env.${{ env.ENVIRONMENT }}
           retention-days: 2
 
   deploy_pages:
