@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   lms-tg-app:
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile
+    image: dj-kostya/lms-tg-app:prod
     container_name: lms-tg-app
     restart: unless-stopped
     ports:
