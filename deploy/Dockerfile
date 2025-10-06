@@ -16,6 +16,10 @@ RUN npm ci
 RUN npx tsp compile . --output-dir ../tsp-output
 
 # Возвращаемся в корневую директорию
+WORKDIR /app/tsp-output/clients/js
+
+RUN npm ci
+
 WORKDIR /app
 
 # Устанавливаем основные зависимости
