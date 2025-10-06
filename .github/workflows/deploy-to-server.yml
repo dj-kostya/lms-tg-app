@@ -71,9 +71,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-    #   - name: Lint
-    #     run: npm run lint
-
       - name: Build
         env:
           NODE_ENV: production
@@ -159,7 +156,7 @@ jobs:
           script: |
             mkdir -p /opt/deploy/${{ env.APP_NAME }}
             cd /opt/deploy/${{ env.APP_NAME }}
-            docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml down --remove-orphans || true
+            docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml down --remove-orphans || true
             docker rmi ${{ env.DOCKER_IMAGE }} || true
 
       - name: Copy files to server
@@ -188,9 +185,9 @@ jobs:
           script: |
             cd /opt/deploy/${{ env.APP_NAME }}
             docker load < ${{ env.APP_NAME }}.tar.gz
-            docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
+            docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
             sleep 15
-            docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml ps
+            docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml ps
             if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
               curl -f http://localhost:3001/health || echo "Health check failed"
             else
