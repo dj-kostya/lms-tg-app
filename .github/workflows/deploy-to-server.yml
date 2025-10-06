@@ -96,7 +96,7 @@ jobs:
 
       - name: Build Docker image with docker-compose
         run: |
-          docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml build --no-cache
+          docker build -f deploy/Dockerfile -t ${{ env.DOCKER_IMAGE }} .
           docker tag ${{ env.DOCKER_IMAGE }} ${{ env.DOCKER_IMAGE }}-$(date +%Y%m%d-%H%M%S)
 
       - name: Save Docker image
