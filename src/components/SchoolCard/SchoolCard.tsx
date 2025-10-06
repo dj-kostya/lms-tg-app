@@ -1,13 +1,13 @@
 import { Section } from '@telegram-apps/telegram-ui';
 import type { FC } from 'react';
-import type { School } from '@/types';
+import type { Course, School } from '@/types';
 
 import { CourseCard } from '@/components/CourseCard/CourseCard';
 import './SchoolCard.css';
 
 interface SchoolCardProps {
   school: School;
-  onCourseClick?: (course: any) => void;
+  onCourseClick?: (course: Course) => void;
 }
 
 export const SchoolCard: FC<SchoolCardProps> = ({ school, onCourseClick }) => {

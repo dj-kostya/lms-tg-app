@@ -29,7 +29,7 @@ export interface School {
   imageUrl?: string;
 }
 
-export interface UserProfile extends LoginResponse { }
+export type UserProfile = LoginResponse;
 
 export interface Achievement {
   id: string;

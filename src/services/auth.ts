@@ -61,7 +61,7 @@ export async function login(initData: string): Promise<AuthResponse> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data: AuthResponse = await response.json();
+    const data = (await response.json()) as unknown as AuthResponse;
     console.log('📥 Auth response:', data);
     return data;
   } catch (error) {

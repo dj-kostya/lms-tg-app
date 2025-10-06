@@ -69,7 +69,8 @@ export async function init(options: {
     bindThemeParamsCssVars();
   }
 
-  mountViewport.isAvailable() && mountViewport().then(() => {
+  if (mountViewport.isAvailable()) {
+    await mountViewport();
     bindViewportCssVars();
-  });
+  }
 }
