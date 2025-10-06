@@ -173,12 +173,12 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
-            ./server-deploy/${{ env.APP_NAME }}.tar.gz
-            ./server-deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
-            ./server-deploy/.env
-            ./server-deploy/deploy.sh
-            ./server-deploy/nginx.conf
-            ./server-deploy/env.${{ env.ENVIRONMENT }}
+            ./server-deploy/${{ env.APP_NAME }}.tar.gz,
+            ./server-deploy/deploy/docker-compose.${{ env.ENVIRONMENT }}.yml,
+            ./server-deploy/deploy/.env
+            ./server-deploy/deploy/deploy.sh,
+            ./server-deploy/deploy/nginx.conf,
+            ./server-deploy/deploy/env.${{ env.ENVIRONMENT }}
           target: "/opt/deploy/${{ env.APP_NAME }}/"
 
       - name: Deploy with docker-compose
