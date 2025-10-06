@@ -65,7 +65,7 @@ jobs:
         working-directory: spec
     
       - name: build client
-        run: npm ci && npm run build
+        run: npm i && npm run build
         working-directory: tsp-output/clients/js
 
       - name: Install dependencies
