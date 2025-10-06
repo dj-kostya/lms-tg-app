@@ -108,7 +108,7 @@ jobs:
         with:
           name: server-deploy-${{ env.ENVIRONMENT }}
           path: |
-            server-deploy/${{ env.APP_NAME }}.tar.gz
+            ${{ env.APP_NAME }}.tar.gz
             server-deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
             server-deploy/.env
             server-deploy/deploy.sh
@@ -170,7 +170,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
-            "server-deploy/${{ env.APP_NAME }}.tar.gz"
+            ${{ env.APP_NAME }}.tar.gz"
             "server-deploy/docker-compose.${{ env.ENVIRONMENT }}.yml:deploy/docker-compose.${{ env.ENVIRONMENT }}.yml"
             "server-deploy/.env:deploy/.env"
             "server-deploy/deploy.sh:deploy/deploy.sh"
