@@ -9,10 +9,10 @@ on:
       environment:
         description: 'Environment to deploy to (server)'
         required: true
-        default: 'production'
+        default: 'prod'
         type: choice
         options:
-          - production
+          - prod
           - staging
       deploy_server:
         description: 'Deploy to server (via SSH + docker-compose)'
