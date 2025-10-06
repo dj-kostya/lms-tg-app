@@ -109,11 +109,11 @@ jobs:
           name: server-deploy-${{ env.ENVIRONMENT }}
           path: |
             ${{ env.APP_NAME }}.tar.gz
-            server-deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
-            server-deploy/.env
-            server-deploy/deploy.sh
-            server-deploy/nginx.conf
-            server-deploy/env.${{ env.ENVIRONMENT }}
+            deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
+            deploy/.env
+            deploy/deploy.sh
+            deploy/nginx.conf
+            deploy/env.${{ env.ENVIRONMENT }}
           retention-days: 2
 
   deploy_pages:
@@ -147,7 +147,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: server-deploy-${{ env.ENVIRONMENT }}
-          path: ./server-deploy
+          path: ./deploy
+
+      - name: List artifacts
+        run: ls -la ./deploy
 
       - name: Prepare server directory
         uses: appleboy/ssh-action@v1.0.3
@@ -163,19 +166,19 @@ jobs:
             docker rmi ${{ env.DOCKER_IMAGE }} || true
 
       - name: Copy files to server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
-            ${{ env.APP_NAME }}.tar.gz"
-            "server-deploy/docker-compose.${{ env.ENVIRONMENT }}.yml:deploy/docker-compose.${{ env.ENVIRONMENT }}.yml"
-            "server-deploy/.env:deploy/.env"
-            "server-deploy/deploy.sh:deploy/deploy.sh"
-            "server-deploy/nginx.conf:deploy/nginx.conf"
-            "server-deploy/env.${{ env.ENVIRONMENT }}:deploy/env.${{ env.ENVIRONMENT }}"
+            deploy/${{ env.APP_NAME }}.tar.gz"
+            "deploy/docker-compose.${{ env.ENVIRONMENT }}.yml:deploy/docker-compose.${{ env.ENVIRONMENT }}.yml"
+            "deploy/.env:deploy/.env"
+            "deploy/deploy.sh:deploy/deploy.sh"
+            "deploy/nginx.conf:deploy/nginx.conf"
+            "deploy/env.${{ env.ENVIRONMENT }}:deploy/env.${{ env.ENVIRONMENT }}"
           target: "/opt/deploy/${{ env.APP_NAME }}/"
 
       - name: Deploy with docker-compose
