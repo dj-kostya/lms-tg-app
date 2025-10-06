@@ -1,6 +1,4 @@
 import type { FC } from 'react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Button,
   List,
@@ -12,23 +10,13 @@ import {
   Spinner
 } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
-import { SimpleHeader } from '@/components/Header';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotifications } from '@/hooks/Notifications';
 import type { Notification } from '@/types';
 
 import './NotificationsPage.css';
 
 export const NotificationsPage: FC = () => {
-  const navigate = useNavigate();
-  const {
-    groupedNotifications,
-    stats,
-    isFromTelegram,
-    markAsRead,
-    markAllAsRead,
-    clearAll
-  } = useNotifications();
-  const [isLoading, setIsLoading] = useState(false);
+  const { notifications, isLoading } = useNotifications();
 
   const formatTimeAgo = (date: Date): string => {
     const now = new Date();
@@ -82,36 +70,7 @@ export const NotificationsPage: FC = () => {
     }
   };
 
-  const handleNotificationClick = (notification: Notification) => {
-    // Помечаем уведомление как прочитанное
-    if (!notification.isRead) {
-      markAsRead(notification.id);
-    }
-
-    // Переходим по ссылке, если она есть
-    if (notification.actionUrl) {
-      navigate(notification.actionUrl);
-    }
-  };
-
-  const handleMarkAllAsRead = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      markAllAsRead();
-      setIsLoading(false);
-    }, 500);
-  };
-
-  const handleClearAll = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      clearAll();
-      setIsLoading(false);
-    }, 500);
-  };
-
-  const formatGroupDate = (dateString: string): string => {
-    const date = new Date(dateString);
+  const formatGroupDate = (date: Date): string => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -142,40 +101,37 @@ export const NotificationsPage: FC = () => {
 
   return (
     <Page back={false}>
-      <SimpleHeader showBackButton={false} className="notifications-page-header" />
       <div className="notifications-page">
         {/* Заголовок с счетчиком */}
         <div className="notifications-header">
           <div className="header-content">
             <Title level="1">Уведомления</Title>
-            {isFromTelegram && (
-              <Text className="data-source-indicator">
-                📱 Данные из Telegram
-              </Text>
-            )}
           </div>
-          {stats.unreadCount > 0 && (
+          {notifications.filter((notification) => !notification.isRead).length > 0 && (
             <Badge type="number" className="unread-badge">
-              {stats.unreadCount}
+              {notifications.filter((notification) => !notification.isRead).length}
             </Badge>
           )}
         </div>
 
         {/* Действия */}
-        {stats.hasNotifications && (
+        {notifications.length > 0 && (
           <div className="notifications-actions">
-            <Button 
-              size="s" 
+            <Button
+              size="s"
               mode="outline"
-              onClick={handleMarkAllAsRead}
-              disabled={stats.unreadCount === 0}
+              disabled={notifications.filter((notification) => !notification.isRead).length === 0}
             >
               Отметить все как прочитанные
             </Button>
-            <Button 
-              size="s" 
+            <Button
+              size="s"
               mode="outline"
-              onClick={handleClearAll}
+              onClick={() => {
+                notifications.forEach((notification) => {
+                  notification.isRead = true;
+                });
+              }}
             >
               Очистить все
             </Button>
@@ -183,14 +139,14 @@ export const NotificationsPage: FC = () => {
         )}
 
         {/* Список уведомлений */}
-        {stats.hasNotifications ? (
+        {notifications.length > 0 ? (
           <List>
-            {Object.entries(groupedNotifications).map(([dateString, dateNotifications]) => (
-              <Section 
-                key={dateString}
-                header={<Section.Header>{formatGroupDate(dateString)}</Section.Header>}
+            {notifications.map((notification) => (
+              <Section
+                key={notification.id}
+                header={<Section.Header>{formatGroupDate(notification.createdAt)}</Section.Header>}
               >
-                {dateNotifications
+                {notifications
                   .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
                   .map((notification) => (
                     <Cell
@@ -205,9 +161,9 @@ export const NotificationsPage: FC = () => {
                           <Text className="notification-time">
                             {formatTimeAgo(notification.createdAt)}
                           </Text>
-                          <Badge 
-                            type="number" 
-                            style={{ 
+                          <Badge
+                            type="number"
+                            style={{
                               backgroundColor: getPriorityColor(notification.priority),
                               marginLeft: '8px'
                             }}
@@ -221,7 +177,6 @@ export const NotificationsPage: FC = () => {
                           <div className="unread-indicator" />
                         )
                       }
-                      onClick={() => handleNotificationClick(notification)}
                       className={`notification-cell ${!notification.isRead ? 'unread' : ''}`}
                     >
                       <div className="notification-content">

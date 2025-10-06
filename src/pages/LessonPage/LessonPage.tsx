@@ -12,7 +12,6 @@ import {
   Avatar
 } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
-import { SimpleHeader } from '@/components/Header';
 import { findCourseById, findSchoolByCourseId } from '@/data/mockData';
 import type { Lesson } from '@/types';
 
@@ -92,7 +91,6 @@ export const LessonPage: FC = () => {
 
   return (
     <Page back={true}>
-      <SimpleHeader className="lesson-page-header" />
       <div className="lesson-page">
         <List>
           {/* Заголовок урока */}

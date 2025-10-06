@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  lms-tg-app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: lms-tg-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:80"  # Внутренний порт для nginx на сервере
+    environment:
+      - NODE_ENV=production
+    networks:
+      - lms-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  lms-network:
+    driver: bridge
+    name: lms-network

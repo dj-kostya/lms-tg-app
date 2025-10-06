@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
 import { initDataState, useSignal } from '@telegram-apps/sdk-react';
-import { mockUserProfile } from '@/data/mockData';
-import { useAuthContext } from '@/components/AuthProvider';
-import type { UserProfile } from '@/types';
 
 /**
  * Хук для получения данных пользователя из контекста авторизации, Telegram Init Data или моков
@@ -10,79 +7,10 @@ import type { UserProfile } from '@/types';
  */
 export function useUserData() {
   const initData = useSignal(initDataState);
-  
-  // Пытаемся получить данные из контекста авторизации
-  let authUser: UserProfile | null = null;
-  let isFromAuth = false;
-  
-  try {
-    const authContext = useAuthContext();
-    if (authContext.isAuthenticated && authContext.user) {
-      authUser = authContext.user;
-      isFromAuth = true;
-    }
-  } catch {
-    // Контекст авторизации недоступен, используем fallback
-  }
-  
-  const userData = useMemo(() => {
-    // Приоритет: данные из авторизации > данные из Telegram > моки
-    if (authUser && isFromAuth) {
-      return {
-        user: authUser,
-        isFromTelegram: false,
-        isFromAuth: true,
-        telegramUser: null,
-        initData: null
-      };
-    }
-    
-    // Если есть данные из Telegram
-    if (initData?.user) {
-      const telegramUser = initData.user;
-      
-      // Преобразуем данные Telegram пользователя в формат UserProfile
-      const userProfile: UserProfile = {
-        id: telegramUser.id.toString(),
-        firstName: telegramUser.first_name || 'Пользователь',
-        lastName: telegramUser.last_name || undefined,
-        username: telegramUser.username || undefined,
-        photoUrl: telegramUser.photo_url || undefined,
-        email: undefined, // Telegram не предоставляет email
-        phone: undefined, // Telegram не предоставляет телефон
-        joinDate: new Date(), // Дата регистрации в приложении
-        level: 'beginner', // По умолчанию
-        totalCourses: 0,
-        completedCourses: 0,
-        totalLessons: 0,
-        completedLessonsCount: 0,
-        studyStreak: 0,
-        totalStudyTime: 0,
-        achievements: [],
-        enrolledCourses: [],
-        completedLessons: []
-      };
+  return useMemo(() => ({
+    user: initData?.user,
+  }), [initData]);
 
-      return {
-        user: userProfile,
-        isFromTelegram: true,
-        isFromAuth: false,
-        telegramUser: telegramUser,
-        initData: initData
-      };
-    }
-    
-    // Fallback на моки для браузера
-    return {
-      user: mockUserProfile,
-      isFromTelegram: false,
-      isFromAuth: false,
-      telegramUser: null,
-      initData: null
-    };
-  }, [initData, authUser, isFromAuth]);
-
-  return userData;
 }
 
 /**
@@ -100,13 +28,16 @@ export function useIsTelegramApp() {
  */
 export function useUserDisplayName() {
   const { user } = useUserData();
-  
+
   return useMemo(() => {
-    if (user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+    if (user?.last_name) {
+      return `${user.first_name} ${user.last_name}`;
     }
-    return user.firstName;
-  }, [user.firstName, user.lastName]);
+    if (user?.first_name) {
+      return user?.first_name;
+    }
+    return user?.username || null;
+  }, [user?.first_name, user?.last_name, user?.username]);
 }
 
 /**
@@ -115,5 +46,5 @@ export function useUserDisplayName() {
  */
 export function useUserAvatar() {
   const { user } = useUserData();
-  return user.photoUrl || null;
+  return user?.photo_url || null;
 }

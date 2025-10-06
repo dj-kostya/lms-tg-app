@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import { useParams } from 'react-router-dom';
 import { List, Section, Text, Title } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
-import { SimpleHeader } from '@/components/Header';
 import { findCourseById, findSchoolByCourseId } from '@/data/mockData';
 import { LessonsList } from '@/components/LessonsList';
 import type { Lesson } from '@/types';
@@ -11,7 +10,7 @@ import './CoursePage.css';
 
 export const CoursePage: FC = () => {
     const { id } = useParams();
-    
+
     if (!id) {
         return (
             <Page back={true}>
@@ -53,19 +52,18 @@ export const CoursePage: FC = () => {
 
     return (
         <Page back={true}>
-            <SimpleHeader className="course-page-header" />
             <div className="course-page">
                 <List>
                     {course.imageUrl && (
                         <Section>
-                            <img 
-                                src={course.imageUrl} 
+                            <img
+                                src={course.imageUrl}
                                 alt={course.title}
                                 className="course-image"
                             />
                         </Section>
                     )}
-                    
+
                     <Section>
                         <Title level="1" className="course-title">
                             {course.title}
@@ -90,14 +88,14 @@ export const CoursePage: FC = () => {
                                     </span>
                                 </div>
                             )}
-                            
+
                             {course.duration && (
                                 <div className="course-info-item">
                                     <span className="course-info-label">Длительность:</span>
                                     <span className="course-info-value">{course.duration}</span>
                                 </div>
                             )}
-                            
+
                             {course.level && (
                                 <div className="course-info-item">
                                     <span className="course-info-label">Уровень:</span>
@@ -106,12 +104,12 @@ export const CoursePage: FC = () => {
                             )}
                         </div>
                     </Section>
-                
+
                 </List>
-                
+
                 {course.lessons && course.lessons.length > 0 && (
-                    <LessonsList 
-                        lessons={course.lessons} 
+                    <LessonsList
+                        lessons={course.lessons}
                         courseId={course.id}
                         onLessonClick={handleLessonClick}
                     />

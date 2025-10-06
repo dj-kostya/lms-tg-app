@@ -1,3 +1,5 @@
+import { LoginResponse } from "tg-lms-backend-api";
+
 export interface Lesson {
   id: string;
   title: string;
@@ -27,26 +29,7 @@ export interface School {
   imageUrl?: string;
 }
 
-export interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName?: string;
-  username?: string;
-  photoUrl?: string;
-  email?: string;
-  phone?: string;
-  joinDate: Date;
-  level: 'beginner' | 'intermediate' | 'advanced';
-  totalCourses: number;
-  completedCourses: number;
-  totalLessons: number;
-  completedLessonsCount: number;
-  studyStreak: number; // дни подряд
-  totalStudyTime: number; // в минутах
-  achievements: Achievement[];
-  enrolledCourses: string[]; // ID курсов
-  completedLessons: string[]; // ID уроков
-}
+export interface UserProfile extends LoginResponse { }
 
 export interface Achievement {
   id: string;

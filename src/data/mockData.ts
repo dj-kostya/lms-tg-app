@@ -1,4 +1,4 @@
-import type { School, Course, UserProfile, StudyStats, Notification, Lesson } from '@/types';
+import type { School, Course, UserProfile, StudyStats, Notification, Lesson, Achievement } from '@/types';
 
 export const mockSchools: School[] = [
   {
@@ -279,22 +279,14 @@ export const findLessonById = (lessonId: string): Lesson | undefined => {
 
 // Моковые данные для профиля пользователя
 export const mockUserProfile: UserProfile = {
-  id: '1',
-  firstName: 'Алексей',
-  lastName: 'Петров',
-  username: 'alex_petrov',
-  photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-  email: 'alex.petrov@example.com',
-  phone: '+7 (999) 123-45-67',
-  joinDate: new Date('2024-01-15'),
-  level: 'intermediate',
-  totalCourses: 5,
-  completedCourses: 2,
-  totalLessons: 25,
-  completedLessonsCount: 12,
-  studyStreak: 7,
-  totalStudyTime: 1800, // 30 часов
-  achievements: [
+  userId: '1',
+  tgUserId: 1234567890,
+  tgUsername: 'alex_petrov',
+};
+
+
+export const mockAchievements: Achievement[] =
+  [
     {
       id: '1',
       title: 'Первый урок',
@@ -327,10 +319,7 @@ export const mockUserProfile: UserProfile = {
       unlockedAt: new Date('2024-02-15'),
       type: 'time_spent'
     }
-  ],
-  enrolledCourses: ['1-1', '1-2', '2-1'],
-  completedLessons: ['1-1-1', '1-1-2', '1-1-3', '1-1-4', '1-1-5', '1-1-6', '1-2-1', '1-2-2', '2-1-1', '2-1-2', '2-1-3', '2-1-4']
-};
+  ];
 
 export const mockStudyStats: StudyStats = {
   thisWeek: {
