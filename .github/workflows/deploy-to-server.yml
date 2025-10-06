@@ -171,11 +171,11 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
             ${{ env.APP_NAME }}.tar.gz,
-            docker-compose.${{ env.ENVIRONMENT }}.yml,
-            .env
-            deploy.sh,
-            nginx.conf,
-            env.${{ env.ENVIRONMENT }}
+            deploy/docker-compose.${{ env.ENVIRONMENT }}.yml,
+            deploy/.env
+            deploy/deploy.sh,
+            deploy/nginx.conf,
+            deploy/env.${{ env.ENVIRONMENT }}
           target: "/opt/deploy/${{ env.APP_NAME }}/"
 
       - name: Deploy with docker-compose
@@ -188,9 +188,9 @@ jobs:
           script: |
             cd /opt/deploy/${{ env.APP_NAME }}
             docker load < ${{ env.APP_NAME }}.tar.gz
-            docker compose -f docker-compose.${{ env.ENVIRONMENT }}.yml up -d
+            docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
             sleep 15
-            docker compose -f docker-compose.${{ env.ENVIRONMENT }}.yml ps
+            docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml ps
             if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
               curl -f http://localhost:3001/health || echo "Health check failed"
             else
