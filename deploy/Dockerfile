@@ -18,7 +18,7 @@ RUN npx tsp compile . --output-dir ../tsp-output
 # Возвращаемся в корневую директорию
 WORKDIR /app/tsp-output/clients/js
 
-RUN npm ci
+RUN npm ci && npm run build
 
 WORKDIR /app
 
