@@ -1,24 +1,20 @@
 # Multi-stage build для оптимизации размера образа
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS typespec-builder
 
+WORKDIR /app/spec
+COPY spec/ ./
+
+RUN ls -la && npm ci
+
+RUN npx tsp compile . --output-dir tsp-output && cd tsp-output/clients/js && npm i && npm run build
+
+FROM node:20-alpine AS main-builder
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем package.json и package-lock.json
 COPY package*.json ./
-COPY spec/ ./spec/
-
-# Устанавливаем зависимости для spec
-WORKDIR /app/spec
-RUN npm ci
-
-# Генерируем спецификацию
-RUN npx tsp compile . --output-dir ../tsp-output
-
-# Возвращаемся в корневую директорию
-WORKDIR /app/tsp-output/clients/js
-
-RUN npm ci && npm run build
+COPY --from=typespec-builder /app/spec/tsp-output/clients/js/ ./tsp-output/clients/js/
 
 WORKDIR /app
 
@@ -32,10 +28,10 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM nginx:alpine as main
 
 # Копируем собранное приложение
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=main-builder /app/dist /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
