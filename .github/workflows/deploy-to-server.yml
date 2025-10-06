@@ -1,4 +1,4 @@
-name: Deploy to Server
+name: CI • Lint, Build, Deploy (Server optional + GitHub Pages)
 
 on:
   push:
@@ -7,25 +7,46 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: 'Environment to deploy to (server)'
         required: true
         default: 'production'
         type: choice
         options:
           - production
           - staging
+      deploy_server:
+        description: 'Deploy to server (via SSH + docker-compose)'
+        required: true
+        default: 'false'
+        type: choice
+        options: ['true','false']
+      deploy_pages:
+        description: 'Deploy to GitHub Pages'
+        required: true
+        default: 'false'
+        type: choice
+        options: ['true','false']
 
 env:
   APP_NAME: lms-tg-app
-  DOCKER_IMAGE: ${{ github.repository }}:${{ github.event.inputs.environment || 'production' }}
   ENVIRONMENT: ${{ github.event.inputs.environment || 'production' }}
+  DOCKER_IMAGE: ${{ github.repository }}:${{ github.event.inputs.environment || 'production' }}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Lint & Build
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -46,12 +67,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
         env:
           NODE_ENV: production
+        run: npm run build
 
-      - name: Create environment file
+      - name: Upload static site artifact (for GitHub Pages)
+        if: |
+          github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_pages == 'true' ||
+          github.event_name != 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Prepare server env file
         run: |
           cp deploy/env.${{ env.ENVIRONMENT }} deploy/.env
           echo "NODE_ENV=${{ env.ENVIRONMENT }}" >> deploy/.env
@@ -67,24 +99,52 @@ jobs:
         run: |
           docker save ${{ env.DOCKER_IMAGE }} | gzip > ${{ env.APP_NAME }}.tar.gz
 
-      - name: Upload Docker image artifact
+      - name: Upload server deploy artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image
-          path: ${{ env.APP_NAME }}.tar.gz
-          retention-days: 1
-
-      - name: Upload docker-compose files
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-compose-files
+          name: server-deploy-${{ env.ENVIRONMENT }}
           path: |
+            ${{ env.APP_NAME }}.tar.gz
             deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
             deploy/.env
             deploy/deploy.sh
             deploy/nginx.conf
             deploy/env.${{ env.ENVIRONMENT }}
-          retention-days: 1
+          retention-days: 2
+
+  deploy_pages:
+    name: Deploy • GitHub Pages
+    needs: build
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_pages == 'true') ||
+      (github.event_name != 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+  deploy_server:
+    name: Deploy • Server (optional)
+    needs: build
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_server == 'true') ||
+      startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: server-deploy-${{ env.ENVIRONMENT }}
+          path: ./server-deploy
 
       - name: Prepare server directory
         uses: appleboy/ssh-action@v1.0.3
@@ -94,14 +154,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            # Создаем директорию для приложения если не существует
             mkdir -p /opt/${{ env.APP_NAME }}
             cd /opt/${{ env.APP_NAME }}
-            
-            # Останавливаем старые контейнеры
             docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml down --remove-orphans || true
-            
-            # Удаляем старые образы
             docker rmi ${{ env.DOCKER_IMAGE }} || true
 
       - name: Copy files to server
@@ -112,12 +167,12 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
-            "${{ env.APP_NAME }}.tar.gz"
-            "deploy/docker-compose.${{ env.ENVIRONMENT }}.yml"
-            "deploy/.env"
-            "deploy/deploy.sh"
-            "deploy/nginx.conf"
-            "deploy/env.${{ env.ENVIRONMENT }}"
+            "server-deploy/${{ env.APP_NAME }}.tar.gz"
+            "server-deploy/docker-compose.${{ env.ENVIRONMENT }}.yml:deploy/docker-compose.${{ env.ENVIRONMENT }}.yml"
+            "server-deploy/.env:deploy/.env"
+            "server-deploy/deploy.sh:deploy/deploy.sh"
+            "server-deploy/nginx.conf:deploy/nginx.conf"
+            "server-deploy/env.${{ env.ENVIRONMENT }}:deploy/env.${{ env.ENVIRONMENT }}"
           target: "/opt/${{ env.APP_NAME }}/"
 
       - name: Deploy with docker-compose
@@ -129,49 +184,15 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             cd /opt/${{ env.APP_NAME }}
-            
-            # Делаем скрипт исполняемым
             chmod +x deploy/deploy.sh
-            
-            # Загружаем образ
             docker load < ${{ env.APP_NAME }}.tar.gz
-            
-            # Запускаем с docker-compose
             docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
-            
-            # Ждем запуска
             sleep 15
-            
-            # Проверяем статус
             docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml ps
-            
-            # Проверяем health check (порт зависит от окружения)
             if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
               curl -f http://localhost:3001/health || echo "Health check failed"
             else
               curl -f http://localhost:3000/health || echo "Health check failed"
             fi
-            
-            # Очищаем старые образы
             docker image prune -f
-            
-            # Удаляем временный файл
             rm -f ${{ env.APP_NAME }}.tar.gz
-
-      - name: Notify deployment status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment successful!"
-            echo "🌍 Environment: ${{ env.ENVIRONMENT }}"
-            if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
-              echo "🚀 Application is available on internal port 3001"
-              echo "📝 Configure nginx on server to proxy to localhost:3001"
-            else
-              echo "🚀 Application is available on internal port 3000"
-              echo "📝 Configure nginx on server to proxy to localhost:3000"
-            fi
-          else
-            echo "❌ Deployment failed!"
-            exit 1
-          fi
