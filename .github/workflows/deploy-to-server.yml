@@ -120,8 +120,7 @@ jobs:
     name: Deploy • GitHub Pages
     needs: build
     if: |
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_pages == 'true') ||
-      (github.event_name != 'workflow_dispatch')
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_pages == 'true')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -158,8 +157,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            mkdir -p /opt/${{ env.APP_NAME }}
-            cd /opt/${{ env.APP_NAME }}
+            mkdir -p /opt/deploy/${{ env.APP_NAME }}
+            cd /opt/deploy/${{ env.APP_NAME }}
             docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml down --remove-orphans || true
             docker rmi ${{ env.DOCKER_IMAGE }} || true
 
@@ -177,7 +176,7 @@ jobs:
             "server-deploy/deploy.sh:deploy/deploy.sh"
             "server-deploy/nginx.conf:deploy/nginx.conf"
             "server-deploy/env.${{ env.ENVIRONMENT }}:deploy/env.${{ env.ENVIRONMENT }}"
-          target: "/opt/${{ env.APP_NAME }}/"
+          target: "/opt/deploy/${{ env.APP_NAME }}/"
 
       - name: Deploy with docker-compose
         uses: appleboy/ssh-action@v1.0.3
@@ -187,7 +186,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /opt/${{ env.APP_NAME }}
+            cd /opt/deploy/${{ env.APP_NAME }}
             chmod +x deploy/deploy.sh
             docker load < ${{ env.APP_NAME }}.tar.gz
             docker compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
