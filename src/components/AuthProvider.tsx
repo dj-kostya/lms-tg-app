@@ -13,6 +13,7 @@ export interface AuthProviderProps {
  * контекст авторизации всем дочерним компонентам
  */
 export function AuthProvider({ children }: AuthProviderProps) {
+  console.log('🚀 AuthProvider')
   const auth = useAuth();
 
   return (

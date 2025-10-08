@@ -39,6 +39,7 @@ function AuthWrapper() {
 }
 
 export function Root({ debug }: { debug: boolean }) {
+  console.log('🚀 Root')
   return (
     <ErrorBoundary fallback={ErrorBoundaryError}>
       <QueryClientProvider client={queryClient}>
