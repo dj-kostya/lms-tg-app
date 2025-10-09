@@ -33,7 +33,7 @@ try {
     mockForMacOS: platform == 'macos',
   })
     .then(() => {
-      console.log('🚀 index.tsx')
+      console.log('🚀 index.tsx', debug)
       root.render(
         <StrictMode>
           <Root debug={debug}/>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { App } from '@/components/App.tsx';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
 import { AuthProvider, AuthLoadingScreen, AuthErrorScreen, useAuthContext } from '@/components/AuthProvider.tsx';
@@ -24,6 +24,14 @@ function ErrorBoundaryError({ error }: { error: unknown }) {
 
 const queryClient = new QueryClient();
 
+const ReactQueryDevtoolsProduction = React.lazy(() =>
+  import('@tanstack/react-query-devtools/build/modern/production.js').then(
+    (d) => ({
+      default: d.ReactQueryDevtools,
+    }),
+  ),
+)
+
 // Компонент для отображения состояния авторизации
 function AuthWrapper() {
   const { isLoading, isAuthenticated, error, refetch } = useAuthContext();
@@ -45,11 +53,18 @@ function AuthWrapper() {
 }
 
 export function Root({ debug }: { debug: boolean }) {
+  const [showDevtools, setShowDevtools] = React.useState(false)
+
+  React.useEffect(() => {
+    // @ts-expect-error
+    window.toggleDevtools = () => setShowDevtools((old) => !old)
+  }, [])
   console.log('🚀 Root')
   return (
     <ErrorBoundary fallback={ErrorBoundaryError}>
       <QueryClientProvider client={queryClient}>
         {debug && <ReactQueryDevtools />}
+        {showDevtools && <ReactQueryDevtoolsProduction />}
         <AuthProvider>
           <AuthWrapper />
         </AuthProvider>
