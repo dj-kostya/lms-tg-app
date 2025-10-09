@@ -30,7 +30,7 @@ try {
   await init({
     debug,
     eruda: debug && ['ios', 'android'].includes(platform),
-    mockForMacOS: platform === 'macos',
+    mockForMacOS: platform == 'macos',
   })
     .then(() => {
       console.log('🚀 index.tsx')

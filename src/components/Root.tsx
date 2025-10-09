@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { App } from '@/components/App.tsx';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
 import { AuthProvider, AuthLoadingScreen, AuthErrorScreen, useAuthContext } from '@/components/AuthProvider.tsx';
@@ -26,6 +27,11 @@ const queryClient = new QueryClient();
 // Компонент для отображения состояния авторизации
 function AuthWrapper() {
   const { isLoading, isAuthenticated, error, refetch } = useAuthContext();
+
+  // Auto call refetch on mount
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (isLoading) {
     return <AuthLoadingScreen />;
