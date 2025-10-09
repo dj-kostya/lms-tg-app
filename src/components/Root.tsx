@@ -53,18 +53,11 @@ function AuthWrapper() {
 }
 
 export function Root({ debug }: { debug: boolean }) {
-  const [showDevtools, setShowDevtools] = React.useState(false)
-
-  React.useEffect(() => {
-    // @ts-expect-error
-    window.toggleDevtools = () => setShowDevtools((old) => !old)
-  }, [])
-  console.log('🚀 Root')
+  console.log('🚀 Root', debug)
   return (
     <ErrorBoundary fallback={ErrorBoundaryError}>
       <QueryClientProvider client={queryClient}>
-        {debug && <ReactQueryDevtools />}
-        {showDevtools && <ReactQueryDevtoolsProduction />}
+        {debug && <ReactQueryDevtoolsProduction />}
         <AuthProvider>
           <AuthWrapper />
         </AuthProvider>
