@@ -15,9 +15,8 @@ on:
           - prod
 
 env:
-  APP_NAME: lms-tg-app
-  DOCKER_IMAGE: ${{ github.repository }}:${{ github.ref }}
   ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
+  DOCKER_IMAGE: ${{ github.repository }}:${{ github.event.inputs.environment || 'staging' }}
 
 jobs:
   build:
