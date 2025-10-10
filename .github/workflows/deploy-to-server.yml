@@ -2,44 +2,22 @@ name: CI • Lint, Build, Deploy (Server optional + GitHub Pages)
 
 on:
   push:
-    branches: ["master", "main"]
     tags: ["v*"]
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to (server)'
+        description: "Environment to deploy to (server)"
         required: true
-        default: 'prod'
+        default: "staging"
         type: choice
         options:
-          - prod
           - staging
-      deploy_server:
-        description: 'Deploy to server (via SSH + docker-compose)'
-        required: true
-        default: 'false'
-        type: choice
-        options: ['true','false']
-      deploy_pages:
-        description: 'Deploy to GitHub Pages'
-        required: true
-        default: 'false'
-        type: choice
-        options: ['true','false']
+          - prod
 
 env:
   APP_NAME: lms-tg-app
-  ENVIRONMENT: ${{ github.event.inputs.environment || 'prod' }}
-  DOCKER_IMAGE: ${{ github.repository }}:${{ github.event.inputs.environment || 'production' }}
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
-  cancel-in-progress: false
+  DOCKER_IMAGE: ${{ github.repository }}:${{ github.ref }}
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
 
 jobs:
   build:
@@ -49,48 +27,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
-      - name: Install spec dependencies
-        run: npm ci
-        working-directory: spec
-
-      - name: Generate TypeSpec
-        run: npx tsp compile . --output-dir ../tsp-output
-        working-directory: spec
-    
-      - name: build client
-        run: npm i && npm run build
-        working-directory: tsp-output/clients/js
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        env:
-          NODE_ENV: production
-        run: npm run build
-
-      - name: Upload static site artifact (for GitHub Pages)
-        if: |
-          github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_pages == 'true' ||
-          github.event_name != 'workflow_dispatch'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-      - name: Prepare server env file
-        run: |
-          cp deploy/env.${{ env.ENVIRONMENT }} deploy/.env
-          echo "NODE_ENV=${{ env.ENVIRONMENT }}" >> deploy/.env
-          echo "APP_NAME=${{ env.APP_NAME }}" >> deploy/.env
-          echo "DOCKER_IMAGE=${{ env.DOCKER_IMAGE }}" >> deploy/.env
-
       - name: Build Docker image with docker-compose
         run: |
           docker build -f deploy/Dockerfile -t ${{ env.DOCKER_IMAGE }} .
@@ -98,53 +34,32 @@ jobs:
 
       - name: Save Docker image
         run: |
-          docker save ${{ env.DOCKER_IMAGE }} | gzip > ${{ env.APP_NAME }}.tar.gz
+          docker save ${{ env.DOCKER_IMAGE }} | gzip > lms-tg-app.${{ github.ref }}.tar.gz
 
       - name: Upload server deploy artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: server-deploy-${{ env.ENVIRONMENT }}
+          name: docker-image-${{ github.ref}}
           path: |
-            ${{ env.APP_NAME }}.tar.gz
-            deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
-            deploy/.env
-            deploy/deploy.sh
-            deploy/nginx.conf
-            deploy/env.${{ env.ENVIRONMENT }}
+            lms-tg-app.${{ github.ref }}.tar.gz
           retention-days: 2
 
-  deploy_pages:
-    name: Deploy • GitHub Pages
+  deploy-to-server:
+    name: Deploy to server
     needs: build
-    if: |
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_pages == 'true')
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  deploy_server:
-    name: Deploy • Server (optional)
-    needs: build
-    if: |
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_server == 'true') ||
-      startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: server-deploy-${{ env.ENVIRONMENT }}
+          name: docker-image-${{ github.ref}}
           path: ./
 
       - name: List artifacts
-        run: ls -la 
+        run: ls -la
 
       - name: Prepare server directory
         uses: appleboy/ssh-action@v1.0.3
@@ -154,8 +69,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            mkdir -p /opt/deploy/${{ env.APP_NAME }}
-            cd /opt/deploy/${{ env.APP_NAME }}
+            mkdir -p /opt/deploy/lms-tg-app
+            cd /opt/deploy/lms-tg-app
             docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml down --remove-orphans || true
             docker rmi ${{ env.DOCKER_IMAGE }} || true
 
@@ -167,13 +82,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
-            ${{ env.APP_NAME }}.tar.gz,
-            deploy/docker-compose.${{ env.ENVIRONMENT }}.yml,
-            deploy/.env
-            deploy/deploy.sh,
-            deploy/nginx.conf,
-            deploy/env.${{ env.ENVIRONMENT }}
-          target: "/opt/deploy/${{ env.APP_NAME }}/"
+            lms-tg-app.${{ github.ref }}.tar.gz,
+            deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
+          target: "/opt/deploy/lms-tg-app/"
 
       - name: Deploy with docker-compose
         uses: appleboy/ssh-action@v1.0.3
@@ -183,8 +94,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /opt/deploy/${{ env.APP_NAME }}
-            docker load < ${{ env.APP_NAME }}.tar.gz
+            cd /opt/deploy/lms-tg-app
+            docker load < lms-tg-app.${{ github.ref }}.tar.gz
             docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
             sleep 15
             docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml ps
@@ -194,4 +105,4 @@ jobs:
               curl -f http://localhost:3000/health || echo "Health check failed"
             fi
             docker image prune -f
-            rm -f ${{ env.APP_NAME }}.tar.gz
+            rm -f lms-tg-app.${{ github.ref }}.tar.gz
