@@ -20,7 +20,7 @@ env:
 
 jobs:
   build:
-    name: Lint & Build
+    name: Build Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,14 +33,14 @@ jobs:
 
       - name: Save Docker image
         run: |
-          docker save ${{ env.DOCKER_IMAGE }} | gzip > lms-tg-app.${{ github.ref }}.tar.gz
+          docker save ${{ env.DOCKER_IMAGE }} | gzip > lms-tg-app.tar.gz
 
       - name: Upload server deploy artifacts
         uses: actions/upload-artifact@v4
         with:
           name: docker-image-${{ github.ref}}
           path: |
-            lms-tg-app.${{ github.ref }}.tar.gz
+            lms-tg-app.tar.gz
           retention-days: 2
 
   deploy-to-server:
@@ -81,7 +81,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
-            lms-tg-app.${{ github.ref }}.tar.gz,
+            lms-tg-app.tar.gz,
             deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
           target: "/opt/deploy/lms-tg-app/"
 
@@ -94,7 +94,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             cd /opt/deploy/lms-tg-app
-            docker load < lms-tg-app.${{ github.ref }}.tar.gz
+            docker load < lms-tg-app.tar.gz
             docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
             sleep 15
             docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml ps
@@ -104,4 +104,4 @@ jobs:
               curl -f http://localhost:3000/health || echo "Health check failed"
             fi
             docker image prune -f
-            rm -f lms-tg-app.${{ github.ref }}.tar.gz
+            rm -f lms-tg-app.tar.gz
