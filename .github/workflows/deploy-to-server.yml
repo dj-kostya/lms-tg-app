@@ -83,7 +83,7 @@ jobs:
           source: |
             lms-tg-app.tar.gz,
             deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
-          target: "/opt/deploy/lms-tg-app/"
+          target: "/opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}/"
 
       - name: Deploy with docker-compose
         uses: appleboy/ssh-action@v1.0.3
@@ -93,7 +93,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /opt/deploy/lms-tg-app
+            cd /opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}
+            mv deploy/docker-compose.${{ env.ENVIRONMENT }}.yml docker-compose.yml
+            rm -f deploy
             docker load < lms-tg-app.tar.gz
             docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
             sleep 15
