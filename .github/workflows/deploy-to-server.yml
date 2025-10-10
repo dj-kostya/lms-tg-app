@@ -73,6 +73,11 @@ jobs:
             docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml down --remove-orphans || true
             docker rmi ${{ env.DOCKER_IMAGE }} || true
 
+      - name: Move docker-compose file
+        run: |
+          mv deploy/docker-compose.${{ env.ENVIRONMENT }}.yml docker-compose.yml
+          rm -rf deploy
+
       - name: Copy files to server
         uses: appleboy/scp-action@v1.0.0
         with:
@@ -82,7 +87,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: |
             lms-tg-app.tar.gz,
-            deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
+            docker-compose.yml
           target: "/opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}/"
 
       - name: Deploy with docker-compose
@@ -94,12 +99,10 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             cd /opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}
-            mv deploy/docker-compose.${{ env.ENVIRONMENT }}.yml docker-compose.yml
-            rm -f deploy
             docker load < lms-tg-app.tar.gz
-            docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml up -d
+            docker-compose -f docker-compose.yml up -d
             sleep 15
-            docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml ps
+            docker-compose -f docker-compose.yml ps
             if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
               curl -f http://localhost:3001/health || echo "Health check failed"
             else
