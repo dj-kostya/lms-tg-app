@@ -24,14 +24,14 @@ jobs:
               run: npx tsp compile . --output-dir ../tsp-output
               working-directory: spec
 
-            - name: build client
+            - name: Build client library
               run: npm i && npm run build
               working-directory: tsp-output/clients/js
 
             - name: Install dependencies
               run: npm ci
 
-            - name: Build
+            - name: Lint
               env:
                   NODE_ENV: production
               run: npm run lint
