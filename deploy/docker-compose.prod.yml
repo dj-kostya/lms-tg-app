@@ -1,12 +1,12 @@
-version: '3.8'
+version: "3.8"
 
 services:
   lms-tg-app:
-    image: dj-kostya/lms-tg-app:prod
+    image: {{ .image }}
     container_name: lms-tg-app
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3000:80"  # Внутренний порт для nginx на сервере
+      - "127.0.0.1:3000:80" # Внутренний порт для nginx на сервере
     environment:
       - NODE_ENV=production
     networks:

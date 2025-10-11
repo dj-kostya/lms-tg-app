@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   lms-tg-app:
-    image: dj-kostya/lms-tg-app:staging
+    image: {{ .image }}
     container_name: lms-tg-app-staging
     restart: unless-stopped
     ports:

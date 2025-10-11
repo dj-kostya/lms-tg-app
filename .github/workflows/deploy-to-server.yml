@@ -16,7 +16,7 @@ on:
 
 env:
   ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
-  DOCKER_IMAGE: ${{ github.repository }}:${{ github.event.inputs.environment || 'staging' }}
+  DOCKER_IMAGE: ${{ github.repository }}:${{ github.sha }}
 
 jobs:
   build:
@@ -76,10 +76,14 @@ jobs:
             mkdir -p /opt/deploy/lms-tg-app
             cd /opt/deploy/lms-tg-app
 
-      - name: Move docker-compose file
-        run: |
-          mv deploy/docker-compose.${{ env.ENVIRONMENT }}.yml docker-compose.yml
-          rm -rf deploy
+      - name: Render template
+        id: render_template
+        uses: chuhlomin/render-template@v1
+        with:
+          template: deploy/docker-compose.${{ env.ENVIRONMENT }}.yml
+          vars: |
+            image: ${{ env.DOCKER_IMAGE }}
+          result_path: docker-compose.yml
 
       - name: Copy files to server
         uses: appleboy/scp-action@v1.0.0
