@@ -3,7 +3,6 @@ version: "3.8"
 services:
   lms-tg-app:
     image: {{ .image }}
-    container_name: lms-tg-app
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:80" # Внутренний порт для nginx на сервере

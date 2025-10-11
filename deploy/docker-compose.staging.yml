@@ -1,9 +1,8 @@
 version: '3.8'
 
 services:
-  lms-tg-app:
+  lms-tg-app-staging:
     image: {{ .image }}
-    container_name: lms-tg-app-staging
     restart: unless-stopped
     ports:
       - "127.0.0.1:3001:80"  # Другой порт для staging
