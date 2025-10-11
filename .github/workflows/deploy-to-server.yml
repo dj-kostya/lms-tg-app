@@ -75,6 +75,7 @@ jobs:
           script: |
             mkdir -p /opt/deploy/lms-tg-app
             cd /opt/deploy/lms-tg-app
+            docker-compose rm 
 
       - name: Render template
         id: render_template
@@ -107,9 +108,9 @@ jobs:
           script: |
             cd /opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}
             docker load < lms-tg-app.tar.gz
-            docker-compose -f docker-compose.yml up -d
+            docker-compose up -d
             sleep 15
-            docker-compose -f docker-compose.yml ps
+            docker-compose ps
             if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
               curl -f http://localhost:3001/health || echo "Health check failed"
             else
