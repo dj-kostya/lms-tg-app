@@ -65,18 +65,6 @@ jobs:
       - name: List artifacts
         run: ls -la
 
-      - name: Prepare server directory
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          script: |
-            mkdir -p /opt/deploy/lms-tg-app
-            cd /opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}
-            docker-compose rm 
-
       - name: Render template
         id: render_template
         uses: chuhlomin/render-template@v1
@@ -107,6 +95,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             cd /opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}
+            docker-compose rm -f
             docker load < lms-tg-app.tar.gz
             docker-compose up -d
             sleep 15
