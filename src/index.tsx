@@ -3,7 +3,7 @@ import '@telegram-apps/telegram-ui/dist/styles.css';
 
 import ReactDOM from 'react-dom/client';
 import { StrictMode } from 'react';
-import { retrieveLaunchParams, retrieveRawInitData } from '@telegram-apps/sdk-react';
+import { retrieveLaunchParams, retrieveRawInitData, requestFullscreen } from '@telegram-apps/sdk-react';
 
 import { Root } from '@/components/Root.tsx';
 import { EnvUnsupported } from '@/components/EnvUnsupported.tsx';
@@ -17,6 +17,7 @@ import './mockEnv.ts';
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 try {
+  
   const launchParams = retrieveLaunchParams();
   const initData = retrieveRawInitData();
   const { tgWebAppPlatform: platform } = launchParams;
@@ -25,7 +26,10 @@ try {
 
   console.log('launchParams', launchParams);
   console.log('initData', initData);
-
+  if (requestFullscreen.isAvailable()) {
+    console.log('🚀 requestFullscreen');
+    await requestFullscreen();
+  }
   // Configure all application dependencies.
   await init({
     debug,

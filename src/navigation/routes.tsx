@@ -5,6 +5,7 @@ import { CoursePage } from '@/pages/CoursePage';
 import { LessonPage } from '@/pages/LessonPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { NotificationsPage } from '@/pages/NotificationsPage';
+import { SchoolPage } from '@/pages/SchoolPage';
 
 interface Route {
   path: string;
@@ -14,6 +15,7 @@ interface Route {
 }
 
 export const routes: Route[] = [
+  { path: '/', Component: SchoolPage, title: 'Главная' },
   { path: '/notifications', Component: NotificationsPage, title: 'Уведомления' },
   { path: '/education', Component: CoursesPage, title: 'Обучение' },
   { path: '/education/course/:id', Component: CoursePage },

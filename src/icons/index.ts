@@ -1,0 +1,1 @@
+export { Icon24Person } from './person';

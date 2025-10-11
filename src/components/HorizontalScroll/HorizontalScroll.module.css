@@ -1,0 +1,20 @@
+.horizontalScroll {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: 16px; /* Отступ между элементами */
+    
+    overflow-x: auto;
+    padding: 20px 12px;
+
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scroll-behavior: smooth;
+}
+
+.horizontalScroll::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
