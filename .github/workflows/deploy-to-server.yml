@@ -30,7 +30,7 @@ jobs:
         uses: ScribeMD/docker-cache@0.5.0
         with:
           key: docker-${{ runner.os }}
-          
+
       - name: Build Docker image with docker-compose
         run: |
           docker build -f deploy/Dockerfile -t ${{ env.DOCKER_IMAGE }} .
@@ -75,8 +75,6 @@ jobs:
           script: |
             mkdir -p /opt/deploy/lms-tg-app
             cd /opt/deploy/lms-tg-app
-            docker-compose -f deploy/docker-compose.${{ env.ENVIRONMENT }}.yml down --remove-orphans || true
-            docker rmi ${{ env.DOCKER_IMAGE }} || true
 
       - name: Move docker-compose file
         run: |
