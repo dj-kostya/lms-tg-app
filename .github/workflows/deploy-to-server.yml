@@ -95,9 +95,8 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             cd /opt/deploy/lms-tg-app/${{ env.ENVIRONMENT }}
-            docker-compose rm -f
             docker load < lms-tg-app.tar.gz
-            docker-compose up -d
+            docker-compose up -d --remove-orphans
             sleep 15
             docker-compose ps
             if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
